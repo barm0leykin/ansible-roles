@@ -1,0 +1,30 @@
+---
+  - name: Updating webapps configs
+    template:
+      src: webapp.conf.j2
+      dest: /etc/nginx/sites-available/{{ item }}.conf
+      owner: root
+      group: root
+      mode: 0644
+    with_items:
+      - "barm0leykin-web"
+    tags: ["websrv-deploy"]
+    notify: Reload nginx
+
+  - name: Simlink {{ item }} virtualhost
+    file:
+      src: /etc/nginx/sites-available/{{ item }}.conf
+      dest: /etc/nginx/sites-enabled/{{ item }}.conf
+      state: link
+    with_items:
+      - "barm0leykin-web"
+    tags: ["websrv-deploy"]
+    notify: Reload nginx
+
+  - name: Copy files
+    copy:
+      src: ../doc/
+      dest: "{{nginx_root_directory}}/{{ item }}/"
+    with_items:
+      - "barm0leykin-web"
+    tags: ["websrv-deploy"]

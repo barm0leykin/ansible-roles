@@ -1,0 +1,65 @@
+{% for item in locations %}
+upstream {{ item.url }}  {
+  server {{ item.host }}:{{ item.port }};
+}
+{% endfor %}
+
+server{
+
+  listen {{ nginx_listen_http }} default_server;
+  {% if letsencrypt_enabled == 1 %}
+  listen {{ nginx_listen_https }} ssl default_server;
+  {% endif %}
+
+  server_name {{ item }}.{{ domain_name }};
+  index index.php;
+  charset utf-8; # кодировка
+
+  {% if letsencrypt_enabled == 1 %}
+  ssl_certificate {{ le_ssl_dir }}/{{ lb_host }}.{{ domain_name }}/fullchain.pem;
+  ssl_certificate_key {{ le_ssl_dir }}/{{ lb_host }}.{{ domain_name }}/privkey.pem;
+  include /etc/nginx/sites-available/ssl.conf;
+
+  location /.well-known/ {
+    root {{nginx_root_directory}};
+  }
+  {% endif %}
+
+  {% for item in locations %}
+    {% if item.url == "php"  %} # для пхп опрабатываем отдельно
+    location /{{ item.url }} {
+      root /project/php; # файлы лежат в /project/php/
+      rewrite ^/{{ item.url }}/(.*)$ /$1 break; # убираю лишний кусок /php/ из url
+      #try_files $uri = 404;
+      fastcgi_split_path_info ^(.+\.php)(/.+)$;
+      fastcgi_index index.php;
+      fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+      include fastcgi_params;
+
+      # хедеры для дебага
+      add_header url "$uri  - request_uri: $request_uri - $upstream_addr: $request" always;
+      add_header params "document_root: $document_root - fastcgi_script_name: $fastcgi_script_name" always;
+
+      fastcgi_pass {{ item.url }};
+    }
+    {% else %}
+    location /{{ item.url }} {
+      rewrite ^/{{ item.url }}/(.*)$ /$1 break; # убираю лишний кусок из url
+      add_header url "$uri  - request_uri: $request_uri - $upstream_addr: $request" always;
+      add_header params "document_root: $document_root";
+      #rewrite /{{ item.url }}/(.*) /$1 permanent;
+      proxy_pass http://{{ item.url }};
+
+      proxy_read_timeout 60s;
+      proxy_set_header Host $host;
+      proxy_set_header X-Real-IP $remote_addr;
+      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      proxy_set_header X-Forwarded-Proto $scheme;
+    }
+    {% endif %}
+  {% endfor %}
+
+    location / {
+      return 403;
+  }
+}

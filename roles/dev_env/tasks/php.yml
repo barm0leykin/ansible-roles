@@ -1,0 +1,13 @@
+---
+  - name: installing PHP packages
+    package:
+      pkg: "{{ php_packages }}"
+      update_cache: yes
+    tags: ["dev", "php", "packages"]
+
+  - name: Copy PHP files
+    copy:
+      src: ../php/
+      dest: /project/php
+      mode: preserve
+    tags: ["dev", "php", "php-copy"]

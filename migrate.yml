@@ -1,0 +1,14 @@
+---
+- hosts: all
+  gather_facts: yes
+  vars:
+    - web_hosts: websrv_deploy
+    - domain_name: devops.rebrain.srwx.net
+    - ansible_user: root
+    - lb_host: barm0leykin-dev
+
+    - go_project_name: ubershop_api_v2
+    - go_project_port: 8081
+  roles:
+    - postgres_db_migration
+    - backend_app_deploy

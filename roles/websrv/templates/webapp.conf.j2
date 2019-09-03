@@ -1,0 +1,26 @@
+server{
+
+  listen {{ nginx_listen_http }};
+  {% if letsencrypt_enabled == 1 %}
+  listen {{ nginx_listen_https }} ssl;
+  {% endif %}
+
+  root {{ nginx_root_directory }}/{{ item }};
+  index index.htm index.html index.php;
+
+  server_name {{ item }}.{{ domain_name }};
+
+  {% if letsencrypt_enabled == 1 %}
+  ssl_certificate {{ le_ssl_dir }}/{{ item }}.{{ domain_name }}/fullchain.pem;
+  ssl_certificate_key {{ le_ssl_dir }}/{{ item }}.{{ domain_name }}/privkey.pem;
+  include /etc/nginx/sites-available/ssl.conf;
+
+  location /.well-known/ {
+    root {{nginx_root_directory}};
+  }
+  {% endif %}
+
+  location / {
+   root {{nginx_root_directory}}/{{ item }};
+  }
+}

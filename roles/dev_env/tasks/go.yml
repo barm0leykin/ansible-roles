@@ -1,0 +1,32 @@
+---
+  - name: installing GO packages
+    package:
+      pkg: "{{ go_packages }}"
+      update_cache: yes
+    tags: ["dev", "packages"]
+
+  - name: Copy GO files
+    copy:
+      src: ../Go/
+      dest: /project/go
+      mode: preserve
+    tags: ["dev", "go", "copy"]
+
+  - name: Run GO webserver
+    shell: |
+      GOPATH=/project/go/
+      cd /project/go/
+      go build go-webapp.go
+      kill -9 $(pidof go-webapp)
+      rm -f go-webapp
+      nohup /project/go/go-webapp &
+    tags: ["dev", "go", "runapp"]
+
+  - name: iptables 8000
+    iptables:
+      chain: INPUT
+      protocol: tcp
+      destination_port: 8000
+      jump: ACCEPT
+    notify: save iptables
+    tags: ["dev", "go", "iptables"]

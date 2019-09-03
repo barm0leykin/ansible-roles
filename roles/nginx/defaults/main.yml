@@ -1,0 +1,25 @@
+---
+  nginx_sendfile: 'on'
+  nginx_tcp_nodelay: 'on'
+  nginx_tcp_nopush: 'on'
+
+  nginx_worker_connections: 16384
+  nginx_log_path: /var/log/nginx
+  nginx_gzip_onoff: "on"
+  nginx_listen_http: 80
+  nginx_listen_https: 443
+
+  nginx_root_directory: /var/www
+  #  domain_name: devops.rebrain.srwx.net
+
+  ###
+  # SSL
+  letsencrypt_enabled: false
+  obtain_cert: 0
+  le_dry_run: yes # " --dry-run"
+  le_ssl_dir:  /etc/letsencrypt/live
+  le_root_directory: /var/www
+  le_email: "bitrush@mail.ru"
+  domain_name: devops.rebrain.srwx.net
+  vhosts: [myhost]
+

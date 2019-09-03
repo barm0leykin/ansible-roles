@@ -1,0 +1,13 @@
+---
+- hosts: all
+  gather_facts: yes
+  vars:
+    - web_hosts: websrv_deploy
+    - domain_name: devops.rebrain.srwx.net
+    - ansible_user: root
+    - lb_host: barm0leykin-dev
+  roles:
+    - common
+    - nginx
+    - postgres_deploy
+    - backend_app_deploy

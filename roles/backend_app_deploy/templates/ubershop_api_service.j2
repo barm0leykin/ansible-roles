@@ -1,0 +1,10 @@
+[Unit]
+Description=Ubershop API Service v1
+Requires=postgresql.service
+Wants=nginx.service
+
+[Service]
+ExecStart={{go_project_path}}/{{go_project_name}}
+
+[Install]
+WantedBy=multi-user.target

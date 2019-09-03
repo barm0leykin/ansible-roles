@@ -1,0 +1,10 @@
+---
+  lb_host: barm0leykin-dev
+  upstream_hosts:
+    - "localhost:8000"
+    - "localhost:8001"
+  locations:
+    - { host: "localhost", port: 8000, url: "golang" }
+    - { host: "localhost", port: 8001, url: "python" }
+    - { host: "unix", port: "/var/run/php/php7.0-fpm.sock", url: "php" }
+  letsencrypt_enabled: false

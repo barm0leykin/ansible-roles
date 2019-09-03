@@ -1,0 +1,40 @@
+---
+  - name: Copy GO files
+    copy:
+      src: ../source/go/{{go_project_name}}
+      dest: "{{go_project_path}}/"
+      mode: preserve
+    tags: ["dev", "go", "copy"]
+
+  - name: SystemD unit {{go_project_name}}
+    template:
+      src: templates/ubershop_api_service.j2
+      dest: "/etc/systemd/system/{{go_project_name}}.service"
+      owner: bin
+      group: sudo
+      mode: 0644
+    tags: ["dev", "go", "systemd"]
+
+  - name: Run {{go_project_name}} service
+    systemd:
+      name: "{{go_project_name}}.service"
+      state: restarted
+      enabled: True
+    tags: ["dev", "go", "systemd"]
+
+#  - name: Run GO webserver
+#    shell: |
+#      kill -9 $(pidof {{go_project_name}})
+      # nohup {{go_project_path}}/{{go_project_name}} &
+#      cd {{go_project_path}}/
+#      ./{{go_project_name}} &
+#    tags: ["dev", "go", "runapp"]
+
+  - name: iptables GO app port ( {{ go_project_port }} )
+    iptables:
+      chain: INPUT
+      protocol: tcp
+      destination_port: "{{ go_project_port }}"
+      jump: ACCEPT
+    notify: save iptables
+    tags: ["dev", "go", "iptables"]

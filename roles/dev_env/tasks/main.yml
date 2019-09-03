@@ -1,0 +1,30 @@
+---
+  - name: include GO env
+    include: go.yml
+    tags: ["dev", "go"]
+
+  - name: include Python env
+    include: python.yml
+    tags: ["dev", "python"]
+
+  - name: include PHP env
+    include: php.yml
+    tags: ["dev", "python"]
+
+  - name: iptables allow ping
+    iptables:
+      chain: INPUT
+      protocol: icmp
+      icmp_type: echo-request
+      jump: ACCEPT
+    notify: save iptables
+    tags: ["dev", "icmp", "iptables"]
+
+  - name: iptables allow ping reply
+    iptables:
+      chain: OUTPUT
+      protocol: icmp
+      icmp_type: echo-reply
+      jump: ACCEPT
+    notify: save iptables
+    tags: ["dev", "icmp", "iptables"]

@@ -1,0 +1,26 @@
+---
+
+  - name: Copy SQL sctipts
+    copy:
+      src: ../source/db/{{item}}
+      dest: /opt/ubershop/bd_dump/
+    with_items:
+      - db_migration_01-02.sql 
+      - db_migration_01-03.sql 
+      - db_restore_from_01-02.sql
+      - db_restore_from_01-03.sql
+    tags: ["postgres_migrate"]
+
+  - name: Run migration to v01-02 from SQL script
+    postgresql_query:
+      db: ubershop
+      path_to_script: /opt/ubershop/bd_dump/db_migration_01-02.sql
+    ignore_errors: yes
+    tags: ["postgres_migrate"]
+
+  - name: Run migration to v01-03 from SQL script
+    postgresql_query:
+      db: ubershop
+      path_to_script: /opt/ubershop/bd_dump/db_migration_01-02.sql
+    ignore_errors: yes
+    tags: ["postgres_migrate"]

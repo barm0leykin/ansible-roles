@@ -1,0 +1,11 @@
+---
+  go_packages:
+    - golang
+
+  python_packages:
+    - python3.5
+    - python-pip
+    - python3.5-venv
+
+  php_packages:
+    - php-fpm

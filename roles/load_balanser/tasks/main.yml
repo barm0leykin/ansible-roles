@@ -1,0 +1,28 @@
+---
+  - debug:
+      msg: "locations: {{ item }}"
+    with_items:
+      - "{{ locations }}"
+    tags: ["lb"]
+
+  - name: Updating load balanser configs
+    template:
+      src: lb.conf.j2
+      dest: /etc/nginx/sites-available/{{ item }}.conf
+      owner: root
+      group: root
+      mode: 0644
+    with_items:
+      - "{{ lb_host }}"
+    tags: ["lb"]
+    notify: Reload nginx
+
+  - name: Simlink {{ item }} load balanser
+    file:
+      src: /etc/nginx/sites-available/{{ item }}.conf
+      dest: /etc/nginx/sites-enabled/{{ item }}.conf
+      state: link
+    with_items:
+      - "{{ lb_host }}"
+    tags: ["lb"]
+    notify: Reload nginx

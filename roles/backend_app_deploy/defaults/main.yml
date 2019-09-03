@@ -1,0 +1,6 @@
+---
+  go_project_path: /opt/ubershop/bin
+  go_project_name: ubershop_api_v1
+  go_project_port: 8080
+
+
